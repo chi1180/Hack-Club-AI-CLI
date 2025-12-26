@@ -14,7 +14,6 @@ export type Screen =
   | { type: "template" }
   | { type: "alias" }
   | { type: "stats" }
-  | { type: "context" }
   | { type: "config" }
   | { type: "help"; command?: string }
   | { type: "exit" };
@@ -28,7 +27,6 @@ export interface AppState {
   db: DB | null;
   isDbReady: boolean;
   error: string | null;
-  contextMode: boolean;
 }
 
 // =============================================================================
@@ -45,8 +43,6 @@ export interface AppContextValue {
   // Error handling
   setError: (error: string | null) => void;
   clearError: () => void;
-  // Context mode
-  setContextMode: (enabled: boolean) => void;
   // Exit
   exit: () => void;
 }
@@ -61,7 +57,6 @@ export type AppAction =
   | { type: "SET_DB"; db: DB }
   | { type: "SET_DB_READY"; ready: boolean }
   | { type: "SET_ERROR"; error: string | null }
-  | { type: "SET_CONTEXT_MODE"; enabled: boolean }
   | { type: "EXIT" };
 
 // =============================================================================

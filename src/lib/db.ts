@@ -1,66 +1,11 @@
 import { Database } from "bun:sqlite";
 import fs from "node:fs";
-
-// =============================================================================
-// Types
-// =============================================================================
-
-export interface ConfigRow {
-  key: string;
-  value: string;
-}
-
-export interface ChatRow {
-  id: string;
-  title: string;
-  tags: string; // JSON array
-  summary: string | null;
-  messageCount: number;
-  tokenCount: number;
-  isFavorite: number; // SQLite boolean (0 or 1)
-  isArchived: number; // SQLite boolean (0 or 1)
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ThreadRow {
-  id: string;
-  messages: string; // JSON array
-}
-
-export interface ImageRow {
-  id: string;
-  model: string;
-  prompt: string;
-  content: string;
-  images: string; // JSON array of base64 encoded images
-  localPaths: string | null; // JSON array of local file paths
-  createdAt: string;
-}
-
-export interface TemplateRow {
-  id: string;
-  name: string;
-  content: string;
-  variables: string; // JSON array
-  usageCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface AliasRow {
-  alias: string;
-  command: string;
-  createdAt: string;
-}
-
-export interface ContextRow {
-  id: string;
-  isActive: number; // SQLite boolean (0 or 1)
-  messages: string; // JSON array
-  startedAt: string;
-  endedAt: string | null;
-}
+import type {
+  ChatRow,
+  ConfigRow,
+  ImageRow,
+  ThreadRow,
+} from "../types/db.types";
 
 // =============================================================================
 // Database Class
@@ -162,17 +107,6 @@ export class DB {
       )
     `);
 
-    // Context table - context mode state
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS context (
-        id TEXT PRIMARY KEY,
-        isActive INTEGER DEFAULT 0,
-        messages TEXT DEFAULT '[]',
-        startedAt TEXT NOT NULL,
-        endedAt TEXT
-      )
-    `);
-
     // Initialize default config values if not exist
     this.initializeDefaultConfig();
   }
@@ -190,7 +124,6 @@ export class DB {
       totalCompletionTokens: "0",
       imageOutputDir: "",
       autoSave: "true",
-      contextMode: "false",
     };
 
     const stmt = this.db.prepare(`
@@ -321,5 +254,56 @@ export class DB {
       "UPDATE chats SET messageCount = ?, updatedAt = ? WHERE id = ?",
       [messages.length, now, id],
     );
+  }
+
+  // =============================================================================
+  // Image methods
+  // =============================================================================
+
+  createImage(
+    id: string,
+    model: string,
+    prompt: string,
+    content: string,
+    images: string[],
+    localPaths: string[] | null,
+  ): void {
+    if (!this.db) return;
+    const now = new Date().toISOString();
+
+    this.db.run(
+      `INSERT INTO images (id, model, prompt, content, images, localPaths, createdAt) VALUES (?, ?, ?, ?, ?, ? , ?)`,
+      [
+        id,
+        model,
+        prompt,
+        content,
+        JSON.stringify(images),
+        JSON.stringify(localPaths),
+        now,
+      ],
+    );
+  }
+
+  listImages(limit?: number): ImageRow[] {
+    if (!this.db) return [];
+
+    if (limit) {
+      return this.db
+        .query<
+          ImageRow,
+          [number]
+        >(`SELECT * FROM images ORDER BY createdAt DESC LIMIT ?`)
+        .all(limit);
+    }
+
+    return this.db
+      .query<ImageRow, []>("SELECT * FROM images ORDER BY createdAt DESC")
+      .all();
+  }
+
+  deleteImage(id: string): void {
+    if (!this.db) return;
+    this.db.run("DELETE FROM images WHERE id = ?", [id]);
   }
 }

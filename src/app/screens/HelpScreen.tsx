@@ -177,17 +177,6 @@ const COMMANDS: Record<string, CommandHelp> = {
       },
     },
   },
-  context: {
-    description: "Context-aware conversation mode",
-    subCommands: {
-      start: {
-        description: "Start context mode (all commands share context)",
-      },
-      end: {
-        description: "End context mode",
-      },
-    },
-  },
   config: {
     description: "Manage application configuration",
     subCommands: {

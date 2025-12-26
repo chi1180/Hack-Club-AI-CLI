@@ -20,15 +20,9 @@ function parseCommand(input: string): ParsedCommand | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
 
-  // コマンドは / で始まる
+  // コマンドは / で始まる必要がある
   if (!trimmed.startsWith("/")) {
-    // 通常のテキスト入力（コンテキストモードでのチャット用）
-    return {
-      command: "chat",
-      subCommand: "message",
-      args: [trimmed],
-      flags: {},
-    };
+    return null;
   }
 
   const parts = trimmed.slice(1).split(/\s+/);
@@ -164,10 +158,6 @@ export default function MainScreen({ onCommand }: MainScreenProps) {
         navigate({ type: "stats" });
         break;
 
-      case "context":
-        navigate({ type: "context" });
-        break;
-
       case "config":
         navigate({ type: "config" });
         break;
@@ -192,16 +182,6 @@ export default function MainScreen({ onCommand }: MainScreenProps) {
 
   return (
     <Box flexDirection="column">
-      {/* Context Mode Indicator */}
-      {state.contextMode && (
-        <Box marginBottom={1}>
-          <Text color="cyan" bold>
-            [Context Mode Active]
-          </Text>
-          <Text color="gray"> - Type /context end to exit</Text>
-        </Box>
-      )}
-
       {/* Error Display */}
       {lastError && (
         <Box marginBottom={1}>
@@ -209,7 +189,7 @@ export default function MainScreen({ onCommand }: MainScreenProps) {
         </Box>
       )}
 
-      {/* Global Error from Context */}
+      {/* Global Error */}
       {state.error && (
         <Box marginBottom={1}>
           <Log tag="error" text={state.error} />
@@ -235,7 +215,8 @@ export default function MainScreen({ onCommand }: MainScreenProps) {
       {/* Hint */}
       <Box marginTop={1}>
         <Text color="gray">
-          Commands: /chat, /image, /search, /model, /config, /help, /exit
+          Commands: /chat, /image, /search, /model, /template, /alias, /stats,
+          /config, /help, /exit
         </Text>
       </Box>
     </Box>

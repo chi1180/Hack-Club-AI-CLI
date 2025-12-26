@@ -13,5 +13,4 @@ export { default as HelpScreen } from "./HelpScreen";
 // export { default as TemplateScreen } from "./TemplateScreen";
 // export { default as AliasScreen } from "./AliasScreen";
 // export { default as StatsScreen } from "./StatsScreen";
-// export { default as ContextScreen } from "./ContextScreen";
 // export { default as ConfigScreen } from "./ConfigScreen";

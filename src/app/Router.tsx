@@ -62,9 +62,6 @@ export default function Router() {
     case "stats":
       return <PlaceholderScreen name="Stats" />;
 
-    case "context":
-      return <PlaceholderScreen name="Context" />;
-
     case "config":
       return <PlaceholderScreen name="Config" />;
 

@@ -73,9 +73,6 @@ The top of command should be start with `/`
 - `/stats` : Show usage statistics
   - [--model] : Filter by model ID
   - [--date] : Filter by date (YYYY-MM format)
-- `/context` : Context-aware conversation mode
-  - `start` : Start context mode (all commands share context)
-  - `end` : End context mode
 - `/config`: Manage application configuration
   - `show` : Show current configuration and usage statistics
   - `set` : Set a configuration value
@@ -156,19 +153,6 @@ The top of command should be start with `/`
 > [INFO] Continuing chat: file-discussion
 ```
 
-## Context mode
-
-```bash
-> /context start
-> [INFO] Context mode enabled. All commands will share context.
-> Tell me about TypeScript
-> [AI responds about TypeScript]
-> Now explain generics
-> [AI responds about generics, considering previous TypeScript context]
-> /context end
-> [INFO] Context mode disabled
-```
-
 ---
 
 # Interactive selections
@@ -204,7 +188,6 @@ When a command parameter is optional and omitted, the app shows an interactive s
 - totalCompletionTokens : number
 - imageOutputDir : string | null
 - autoSave : boolean
-- contextMode : boolean
 
 ## Chats
 
@@ -273,14 +256,6 @@ When a command parameter is optional and omitted, the app shows an interactive s
 - command : string // full command to execute
 - createdAt : datetime
 
-## Context
-
-- id : string (UUID)
-- isActive : boolean
-- messages : array // shared context messages
-- startedAt : datetime
-- endedAt : datetime | null
-
 ---
 
 # Configuration keys
@@ -290,7 +265,6 @@ Available configuration keys for `/config set`:
 - `default-model` : Default AI model ID (e.g., "qwen/qwen3-32b")
 - `auto-save` : Auto-save chats (true/false)
 - `image-output-dir` : Default directory for saving generated images
-- `context-mode` : Enable/disable context mode (true/false)
 
 ---
 
@@ -309,7 +283,6 @@ Available configuration keys for `/config set`:
 │ Completion Tokens: 15,080           │
 │ Current Model: qwen/qwen3-32b       │
 │ Average Chat Length: 8 messages     │
-│ Context Mode: Disabled              │
 └─────────────────────────────────────┘
 ```
 

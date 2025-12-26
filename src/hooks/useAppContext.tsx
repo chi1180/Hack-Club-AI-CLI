@@ -17,7 +17,6 @@ const initialState: AppState = {
   db: null,
   isDbReady: false,
   error: null,
-  contextMode: false,
 };
 
 // =============================================================================
@@ -41,9 +40,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case "SET_ERROR":
       return { ...state, error: action.error };
-
-    case "SET_CONTEXT_MODE":
-      return { ...state, contextMode: action.enabled };
 
     case "EXIT":
       return { ...state, screen: { type: "exit" } };
@@ -99,10 +95,6 @@ export function AppProvider({ children, initialScreen }: AppProviderProps) {
       dispatch({ type: "SET_ERROR", error: null });
     },
 
-    setContextMode: (enabled: boolean) => {
-      dispatch({ type: "SET_CONTEXT_MODE", enabled });
-    },
-
     exit: () => {
       dispatch({ type: "EXIT" });
       // 少し待ってから実際に終了
@@ -151,9 +143,4 @@ export function useIsDbReady(): boolean {
 export function useError(): string | null {
   const { state } = useAppContext();
   return state.error;
-}
-
-export function useContextMode(): boolean {
-  const { state } = useAppContext();
-  return state.contextMode;
 }
