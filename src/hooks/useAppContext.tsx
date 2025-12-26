@@ -30,7 +30,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, screen: action.screen, error: null };
 
     case "GO_BACK":
-      // 基本的にはmain画面に戻る
+      // Back action always returns to main screen
       return { ...state, screen: { type: "main" }, error: null };
 
     case "SET_DB":
