@@ -135,9 +135,17 @@
 - [x] Config methods (getConfig, setConfig, getAllConfig)
 - [x] Chat methods (createChat, getChat, getChatByTitle, listChats, deleteChat)
 - [x] Thread methods (getThread, updateThreadMessages)
-- [ ] 1. Image methods (createImage, listImages, deleteImage)
-- [ ] 2. Template methods (createTemplate, getTemplateByName, listTemplates, updateTemplate, deleteTemplate)
-- [ ] 3. Alias methods (createAlias, getAlias, listAliases, deleteAlias)
+- [x] 1. Image methods (createImage, listImages, deleteImage)
+- [x] 2. Template methods (createTemplate, getTemplateByName, listTemplates, updateTemplate, deleteTemplate)
+- [x] 3. Alias methods (createAlias, getAlias, listAliases, deleteAlias)
+
+### Improvements (from db.ts.review.md)
+
+- [ ] 85. Add error handling to all DB methods (try-catch, error logging, boolean returns) ⚠️ 最重要
+- [ ] 86. Add transaction support for multi-query operations (createChat, deleteChat) ⚠️
+- [ ] 87. Unify return types (read: data|null, write: boolean, delete: boolean)
+- [ ] 88. Handle UNIQUE constraint violations (createAlias, createTemplate - UPSERT or explicit check)
+- [ ] 89. Return boolean from delete methods (check `result.changes > 0`)
 
 ### Migrations
 
@@ -173,6 +181,7 @@
 - [ ] 28. Invalid command feedback
 - [ ] 78. File not found handling
 - [ ] 79. Permission error handling
+- [ ] 84. Database operation error handling (SQL query failures) → See #85-89
 
 ---
 
@@ -199,8 +208,9 @@
 | Priority    | Range | Category              | Description                                     |
 | ----------- | ----- | --------------------- | ----------------------------------------------- |
 | 🔴 Critical | 1-7   | DB + AI Core          | DB CRUD methods + OpenRouter client + streaming |
+| 🔴 Critical | 85-89 | DB Improvements       | Error handling, transactions, return types      |
 | 🟠 High     | 8-18  | Chat + Errors         | ChatScreen core + components + error handling   |
 | 🟡 Medium   | 19-31 | Model + Config + Docs | ModelScreen, ConfigScreen, documentation        |
 | 🟢 Standard | 32-42 | MainScreen + Chat     | Command history, autocomplete, chat extras      |
 | 🔵 Later    | 43-63 | Other Screens         | Image, Search, Template, Alias, Stats           |
-| ⚪ Optional | 64-83 | Polish                | Advanced components, migrations, testing        |
+| ⚪ Optional | 64-84 | Polish                | Advanced components, migrations, testing        |

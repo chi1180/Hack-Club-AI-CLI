@@ -1,9 +1,11 @@
 import { Database } from "bun:sqlite";
 import fs from "node:fs";
 import type {
+  AliasRow,
   ChatRow,
   ConfigRow,
   ImageRow,
+  TemplateRow,
   ThreadRow,
 } from "../types/db.types";
 
@@ -305,5 +307,101 @@ export class DB {
   deleteImage(id: string): void {
     if (!this.db) return;
     this.db.run("DELETE FROM images WHERE id = ?", [id]);
+  }
+
+  // =============================================================================
+  // Template methods
+  // =============================================================================
+
+  createTemplate(
+    id: string,
+    name: string,
+    content: string,
+    variables: string[],
+    usageCount: number,
+  ): void {
+    if (!this.db) return;
+    const now = new Date().toISOString();
+
+    this.db.run(
+      `INSERT INTO templates (id, name, content, variables, usageCount, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [id, name, content, JSON.stringify(variables), usageCount, now, now],
+    );
+  }
+
+  getTemplateByName(name: string): TemplateRow | null {
+    if (!this.db) return null;
+    return (
+      this.db
+        .query<TemplateRow, [string]>("SELECT * FROM templates WHERE name = ?")
+        .get(name) ?? null
+    );
+  }
+
+  listTemplates(): TemplateRow[] {
+    if (!this.db) return [];
+
+    return this.db
+      .query<
+        TemplateRow,
+        []
+      >("SELECT * FROM templates ORDER BY usageCount DESC")
+      .all();
+  }
+
+  updateTemplate(
+    id: string,
+    name: string,
+    content: string,
+    variables: string[],
+    usageCount: number,
+  ): void {
+    if (!this.db) return;
+    const now = new Date().toISOString();
+    this.db.run(
+      `UPDATE templates SET name = ?, content = ?, variables = ?, usageCount = ?, updatedAt = ? WHERE id = ?`,
+      [name, content, JSON.stringify(variables), usageCount, now, id],
+    );
+  }
+
+  deleteTemplate(id: string): void {
+    if (!this.db) return;
+    this.db.run("DELETE FROM templates WHERE id = ?", [id]);
+  }
+
+  // =============================================================================
+  // Alias methods
+  // =============================================================================
+
+  createAlias(alias: string, command: string): void {
+    if (!this.db) return;
+    const now = new Date().toISOString();
+
+    this.db.run(
+      `INSERT INTO aliases (alias, command, createdAt) VALUES (?, ?, ?)`,
+      [alias, command, now],
+    );
+  }
+
+  getAlias(alias: string): AliasRow | null {
+    if (!this.db) return null;
+    return (
+      this.db
+        .query<AliasRow, [string]>("SELECT * FROM aliases WHERE alias = ?")
+        .get(alias) ?? null
+    );
+  }
+
+  listAliases(): AliasRow[] {
+    if (!this.db) return [];
+
+    return this.db
+      .query<AliasRow, []>("SELECT * FROM aliases ORDER BY createdAt DESC")
+      .all();
+  }
+
+  deleteAlias(alias: string): void {
+    if (!this.db) return;
+    this.db.run("DELETE FROM aliases WHERE alias = ?", [alias]);
   }
 }
