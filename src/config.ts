@@ -2,6 +2,7 @@
 // App
 // =============================================================================
 
+import type { ImageGenerativeModel } from "./types/ai/generateImage.types";
 import type { ChatsDB, SettingsDB } from "./types/db/types";
 
 export const APP_NAME = "Hack Club AI CLI";
@@ -46,7 +47,7 @@ export const TITLING = {
   }, // if the amount of conversation is more than 10 messages, use only the first 2 and last 3 messages for titling
 };
 
-export const IMAGE_GENERATIVE_MODELS = [
+export const IMAGE_GENERATIVE_MODELS: ImageGenerativeModel[] = [
   "google/gemini-2.5-flash-image-preview",
   "google/gemini-3-pro-image-preview",
 ];
