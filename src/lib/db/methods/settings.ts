@@ -1,8 +1,8 @@
 import type { Low } from "lowdb";
 import { JSONFilePreset } from "lowdb/node";
 import { DEFAULT_SETTINGS } from "../../../config";
-import type { ModelType } from "../../../types/config.types";
-import type { SettingsDB } from "../../../types/db.types";
+import type { ModelType } from "../../../types/db/types";
+import type { SettingsDB } from "../../../types/db/types";
 import { AI } from "../../ai/ai";
 
 export class Settings {

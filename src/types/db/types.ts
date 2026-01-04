@@ -1,3 +1,30 @@
+// =============================================================================
+// Chats
+// =============================================================================
+
+export type ChatsDB = {
+  chats: Chat[];
+};
+
+export interface Chat {
+  id: string;
+  timestamp: number;
+  title: string;
+  messages: []; // TODO: define message type
+  starred?: boolean;
+}
+
+// =============================================================================
+// Settings
+// =============================================================================
+
+export type SettingsDB = {
+  models: ModelType[];
+  lastUsedModel: string;
+  showStatusBar: boolean;
+  showCommandsHelp: boolean;
+};
+
 // Model architecture type
 export interface ModelArchitecture {
   modality: string;
@@ -51,11 +78,4 @@ export interface ModelType {
   default_parameters: ModelDefaultParameters;
   // Custom fields for UI
   starred?: boolean;
-}
-
-export interface DefaultSettingsType {
-  models: ModelType[];
-  lastUsedModel: string;
-  showStatusBar: boolean;
-  showCommandsHelp: boolean;
 }

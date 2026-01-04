@@ -1,7 +1,7 @@
 import type { Low } from "lowdb";
 import { JSONFilePreset } from "lowdb/node";
 import { DEFAULT_CHATS } from "../../../config";
-import type { Chat, ChatsDB } from "../../../types/db.types";
+import type { Chat, ChatsDB } from "../../../types/db/types";
 
 export class Chats {
   readonly path: string;

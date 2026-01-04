@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "../../../config";
-import type { ModelType } from "../../../types/config.types";
+import type { ModelType } from "../../../types/db/types";
 import { log } from "../../log";
 
 export async function getModels() {
@@ -7,6 +7,7 @@ export async function getModels() {
     tag: "info",
     text: "Fetching available models from API...",
   });
+
   const response = await fetch(API_ENDPOINTS.LIST_MODELS);
   if (!response.ok) {
     log({

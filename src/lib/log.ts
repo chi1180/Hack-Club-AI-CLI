@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import type { LabelProps } from "../types/components.label.types";
+import type { LabelProps } from "../types/components/label.types";
 
 export function log({ text, tag }: LabelProps) {
   let label: string;
