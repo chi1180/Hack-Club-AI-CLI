@@ -1,0 +1,22 @@
+{
+  "name": "hackclubaicli",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@types/react": "^19.2.7",
+    "ink": "^6.6.0",
+    "ink-big-text": "^2.0.0",
+    "ink-gradient": "^3.0.0",
+    "react": "^19.2.3"
+  },
+  "scripts": {
+    "start": "bun run index.ts"
+  }
+}
