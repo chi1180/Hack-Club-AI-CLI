@@ -3,24 +3,29 @@
 // =============================================================================
 
 import type { DefaultSettingsType } from "./types/config.types";
+import type { ChatsDB, SettingsDB } from "./types/db.types";
 
 export const APP_NAME = "Hack Club AI CLI";
 export const APP_DIRECTORY_NAME = ".hackclubaicli";
 export const APP_SETTINGS_FILE_NAME = "settings.json";
-export const APP_DB_FILE_NAME = "hackcubaicli-db";
+export const APP_CHATS_FILE_NAME = "chats.json";
 export const API_ENDPOINTS = {
   LIST_MODELS: "https://ai.hackclub.com/proxy/v1/models",
 };
 
 // =============================================================================
-// Settings
+// DB
 // =============================================================================
 
-export const DEFAULT_SETTINGS: DefaultSettingsType = {
+export const DEFAULT_SETTINGS: SettingsDB = {
   models: [],
   lastUsedModel: "qwen/qwen3-32b",
   showStatusBar: true,
   showCommandsHelp: true,
+};
+
+export const DEFAULT_CHATS: ChatsDB = {
+  chats: [],
 };
 
 // =============================================================================

@@ -3,7 +3,7 @@ import type { LabelProps } from "../types/components.label.types";
 
 export function log({ text, tag }: LabelProps) {
   let label: string;
-  const formattedTag = ` [ ${tag.toUpperCase()} ] `;
+  const formattedTag = ` ${tag.toUpperCase()} `;
 
   switch (tag) {
     case "error":
@@ -24,4 +24,5 @@ export function log({ text, tag }: LabelProps) {
   }
 
   console.log(`${label} ${text}`);
+  console.log("");
 }
