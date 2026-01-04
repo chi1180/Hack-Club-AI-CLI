@@ -17,17 +17,37 @@ export interface Chat {
 export interface MessageFromUser {
   type: "message";
   role: "user";
-  content: string;
   timestamp: number;
+  content: Contents["text"];
 }
 
 export interface MessageFromAI {
   role: "assistant";
-  content: string;
   timestamp: number;
   model: string;
   id: string;
   status: "completed";
+  content: Contents["text"];
+}
+
+export interface Contents {
+  text: {
+    type: "text";
+    text: string;
+  };
+  image: {
+    type: "image_url";
+    image_url: {
+      url: string;
+    };
+  };
+  file: {
+    type: "file";
+    file: {
+      filename: string;
+      file_data: string;
+    };
+  };
 }
 
 // =============================================================================

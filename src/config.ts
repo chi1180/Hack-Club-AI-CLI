@@ -2,15 +2,18 @@
 // App
 // =============================================================================
 
-import type { DefaultSettingsType } from "./types/config.types";
 import type { ChatsDB, SettingsDB } from "./types/db.types";
 
 export const APP_NAME = "Hack Club AI CLI";
 export const APP_DIRECTORY_NAME = ".hackclubaicli";
 export const APP_SETTINGS_FILE_NAME = "settings.json";
 export const APP_CHATS_FILE_NAME = "chats.json";
+export const API_BASE_URL = "https://ai.hackclub.com/proxy/v1/";
 export const API_ENDPOINTS = {
-  LIST_MODELS: "https://ai.hackclub.com/proxy/v1/models",
+  LIST_MODELS: API_BASE_URL.concat("models"),
+  RESPONSIBLE_CHAT: API_BASE_URL.concat("responses"),
+  SINGLE_SHOT_CHAT: API_BASE_URL.concat("chat/completions"),
+  TOKEN_STATS: API_BASE_URL.concat("stats"),
 };
 
 // =============================================================================
@@ -39,6 +42,11 @@ export const TITLING = {
     tail: 3,
   }, // if the amount of conversation is more than 10 messages, use only the first 2 and last 3 messages for titling
 };
+
+export const IMAGE_GENERATIVE_MODELS = [
+  "google/gemini-2.5-flash-image-preview",
+  "google/gemini-3-pro-image-preview",
+];
 
 // =============================================================================
 // Component
