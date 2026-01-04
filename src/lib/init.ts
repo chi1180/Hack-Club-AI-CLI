@@ -1,12 +1,11 @@
-import { existsSync, statSync } from "node:fs";
+import fs from "node:fs";
+import { Settings } from "./settings/settings";
 
-export function init(dirPath: string) {
-  // Check existing
-  const isDirExists = existsSync(dirPath) && statSync(dirPath).isDirectory();
-  if (isDirExists) {
-    console.info(`Directory already exists at ${dirPath}`);
-  } else {
-    console.error(`Directory does not exist at ${dirPath}`);
-    process.exit(1);
-  }
+export async function init(appDirPath: string) {
+  // make directory
+  fs.mkdirSync(appDirPath);
+
+  // run settings and db initialization
+  const _Settings = new Settings(appDirPath);
+  await _Settings.init();
 }
