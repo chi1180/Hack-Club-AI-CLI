@@ -18,8 +18,32 @@ export interface GenerateImageRequest extends ChatCompletionsRequest {
    * @description only image generative models assignable
    */
   model: ImageGenerativeModel;
-  modalities: string[];
-  image_config: {
-    aspect_ratio: string;
-  };
+
+  /**
+   * @type enum
+   * @requires Yes
+   * @description Set to ["image", "text"] for image generation
+   */
+  modalities: ["image", "text"];
+}
+
+// =============================================================================
+// Response
+// =============================================================================
+
+export interface GenerateImageResponse {
+  choices: [
+    {
+      message: {
+        role: "assistant";
+        content: string;
+        images: {
+          type: "image_url";
+          image_url: {
+            url: string;
+          };
+        }[];
+      };
+    },
+  ];
 }

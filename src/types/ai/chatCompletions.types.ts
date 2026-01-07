@@ -1,6 +1,12 @@
 export interface MessageObject {
-  role: "system" | "user" | "assistant";
-  content: string;
+  request: {
+    role: "user";
+    content: string;
+  };
+  response: {
+    role: "system" | "assistant";
+    content: string;
+  };
 }
 
 // =============================================================================
@@ -23,7 +29,7 @@ export interface ChatCompletionsRequest {
    * @requires Yes
    * @description Array of message objects
    */
-  message: MessageObject[];
+  message: MessageObject["request"][];
 
   /**
    * @type boolean
@@ -68,7 +74,7 @@ export interface ChatCompletionsResponse {
   model: string;
   choices: {
     index: number;
-    message: MessageObject;
+    message: MessageObject["response"][];
     finish_reason: string;
   }[];
   usage: {

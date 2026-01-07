@@ -22,7 +22,7 @@ export async function generateImage(
     };
 
     const response = await fetch(API_ENDPOINTS.SINGLE_SHOT_CHAT, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
