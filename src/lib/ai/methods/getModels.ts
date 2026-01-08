@@ -1,8 +1,11 @@
 import { API_ENDPOINTS } from "../../../config";
-import type { ModelType } from "../../../types/db/types";
+import {
+  GetModelsResponseSchema,
+  type GetModelsResponse,
+} from "../../../types/ai/getModels.types";
 import { log } from "../../log";
 
-export async function getModels() {
+export async function getModels(): Promise<GetModelsResponse["data"]> {
   log({
     tag: "info",
     text: "Fetching available models from API...",
@@ -21,6 +24,8 @@ export async function getModels() {
     tag: "success",
     text: "Successfully fetched models from API.",
   });
-  const data = (await response.json()) as { data: ModelType[] };
-  return data.data;
+  const data = await response.json();
+  const result = GetModelsResponseSchema.parse(data);
+
+  return result.data;
 }
