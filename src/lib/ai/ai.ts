@@ -25,7 +25,7 @@ export class AI {
       process.exit(1);
     }
 
-    // instantiate methods
+    // assign methods
     this._getModels = getModels;
     this._getStats = () => getStats(this.API_TOKEN);
   }
