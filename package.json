@@ -15,9 +15,9 @@
     "ink": "^6.6.0",
     "ink-big-text": "^2.0.0",
     "ink-gradient": "^3.0.0",
-    "io-ts": "^2.2.22",
     "lowdb": "^7.0.1",
-    "react": "^19.2.3"
+    "react": "^19.2.3",
+    "zod": "^4.3.5"
   },
   "scripts": {
     "start": "bun run index.ts"

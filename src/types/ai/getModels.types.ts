@@ -1,81 +1,94 @@
-import * as t from "io-ts";
+import { z } from "zod";
 
-// Architecture codec
-export const ArchitectureCodec = t.type({
-  modality: t.string,
-  input_modalities: t.array(t.string),
-  output_modalities: t.array(t.string),
-  tokenizer: t.string,
-  instruct_type: t.union([t.string, t.null]),
+// =============================================================================
+// Schema
+// =============================================================================
+
+/**
+ * Architecture schema
+ */
+export const ArchitectureSchema = z.object({
+  modality: z.string(),
+  input_modalities: z.array(z.string()),
+  output_modalities: z.array(z.string()),
+  tokenizer: z.string(),
+  instruct_type: z.string().nullable(),
 });
 
-export type Architecture = t.TypeOf<typeof ArchitectureCodec>;
-
-// Pricing codec - all fields are string representations of numbers
-// Some fields are optional depending on the model
-export const PricingCodec = t.intersection([
-  t.type({
-    prompt: t.string,
-    completion: t.string,
-    request: t.string,
-    image: t.string,
-    web_search: t.string,
-    internal_reasoning: t.string,
-  }),
-  t.partial({
-    audio: t.string,
-    input_cache_read: t.string,
-    input_cache_write: t.string,
-  }),
-]);
-
-export type Pricing = t.TypeOf<typeof PricingCodec>;
-
-// Top provider codec
-export const TopProviderCodec = t.type({
-  context_length: t.number,
-  max_completion_tokens: t.union([t.number, t.null]),
-  is_moderated: t.boolean,
+/**
+ * Pricing schema
+ * @description all fields are string representations of numbers. Some fields are optional depending on the model
+ */
+export const PricingSchema = z.object({
+  prompt: z.string(),
+  completion: z.string(),
+  request: z.string(),
+  image: z.string(),
+  web_search: z.string(),
+  internal_reasoning: z.string(),
+  audio: z.string().optional(),
+  input_cache_read: z.string().optional(),
+  input_cache_write: z.string().optional(),
 });
 
-export type TopProvider = t.TypeOf<typeof TopProviderCodec>;
-
-// Default parameters codec - all fields are optional and can be null
-export const DefaultParametersCodec = t.partial({
-  temperature: t.union([t.number, t.null]),
-  top_p: t.union([t.number, t.null]),
-  frequency_penalty: t.union([t.number, t.null]),
+/**
+ * Top provider schema
+ */
+export const TopProviderSchema = z.object({
+  context_length: z.number(),
+  max_completion_tokens: z.number().nullable(),
+  is_moderated: z.boolean(),
 });
 
-export type DefaultParameters = t.TypeOf<typeof DefaultParametersCodec>;
-
-// Model codec
-export const ModelCodec = t.type({
-  id: t.string,
-  canonical_slug: t.string,
-  hugging_face_id: t.string,
-  name: t.string,
-  created: t.number,
-  description: t.string,
-  context_length: t.number,
-  architecture: ArchitectureCodec,
-  pricing: PricingCodec,
-  top_provider: TopProviderCodec,
-  per_request_limits: t.union([t.unknown, t.null]),
-  supported_parameters: t.array(t.string),
-  default_parameters: DefaultParametersCodec,
+/**
+ * Default parameters schema
+ * @description all fields are optional and can be null
+ */
+export const DefaultParametersSchema = z.object({
+  temperature: z.number().nullable().optional(),
+  top_p: z.number().nullable().optional(),
+  frequency_penalty: z.number().nullable().optional(),
 });
 
-export type Model = t.TypeOf<typeof ModelCodec>;
-
-// Models array codec
-export const ModelsCodec = t.array(ModelCodec);
-
-export type Models = t.TypeOf<typeof ModelsCodec>;
-
-// API Response codec for getModels endpoint
-export const GetModelsResponseCodec = t.type({
-  data: ModelsCodec,
+/**
+ * Model schema
+ */
+export const ModelSchema = z.object({
+  id: z.string(),
+  canonical_slug: z.string(),
+  hugging_face_id: z.string(),
+  name: z.string(),
+  created: z.number(),
+  description: z.string(),
+  context_length: z.number(),
+  architecture: ArchitectureSchema,
+  pricing: PricingSchema,
+  top_provider: TopProviderSchema,
+  per_request_limits: z.unknown().nullable(),
+  supported_parameters: z.array(z.string()),
+  default_parameters: DefaultParametersSchema,
 });
 
-export type GetModelsResponse = t.TypeOf<typeof GetModelsResponseCodec>;
+/**
+ * Models array schema
+ */
+export const ModelsSchema = z.array(ModelSchema);
+
+/**
+ * API Response schema for getModels endpoint
+ */
+export const GetModelsResponseSchema = z.object({
+  data: ModelsSchema,
+});
+
+// =============================================================================
+// Types
+// =============================================================================
+
+export type Architecture = z.infer<typeof ArchitectureSchema>;
+export type Pricing = z.infer<typeof PricingSchema>;
+export type TopProvider = z.infer<typeof TopProviderSchema>;
+export type DefaultParameters = z.infer<typeof DefaultParametersSchema>;
+export type Model = z.infer<typeof ModelSchema>;
+export type Models = z.infer<typeof ModelsSchema>;
+export type GetModelsResponse = z.infer<typeof GetModelsResponseSchema>;
