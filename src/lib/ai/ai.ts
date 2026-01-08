@@ -1,6 +1,6 @@
 import { API_KEY_NAME } from "../../config";
 import type { AIStats } from "../../types/ai/stats.types";
-import type { ModelType } from "../../types/db/types";
+import type { GetModelsResponse } from "../../types/ai/getModels.types";
 import { log } from "../log";
 import { getModels } from "./methods/getModels";
 import { getStats } from "./methods/getStats";
@@ -9,7 +9,7 @@ export class AI {
   private readonly API_TOKEN: string;
 
   // methods
-  _getModels: () => Promise<ModelType[]>;
+  _getModels: () => Promise<GetModelsResponse["data"]>;
   _getStats: (apiToken: string) => Promise<AIStats>; // it can write as `typeof getStats` but for clarity, we define the function signature here
 
   constructor() {
