@@ -14,6 +14,6 @@ describe("AI class methods test", () => {
 
   test("getModels function's response data should be the form of specific schema", async () => {
     const response = await _AI._getModels();
-    expect(response).toBe
+    expect(response).to
   }
 });
