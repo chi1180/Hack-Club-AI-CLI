@@ -48,8 +48,7 @@ export const TITLING = {
 };
 
 export const IMAGE_GENERATIVE_MODELS: ImageGenerativeModel[] = [
-  "google/gemini-2.5-flash-image-preview",
-  "google/gemini-3-pro-image-preview",
+  "google/gemini-2.5-flash-image",
 ];
 
 // =============================================================================
@@ -63,6 +62,7 @@ export const PALETTE = {
   error: "#FF6B6B",
   success: "#51CF66",
   warning: "#FFD93D",
+  warn: "#FFD93D", // alias for warning
   info: "#74C0FC",
 
   // UI elements

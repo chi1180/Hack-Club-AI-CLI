@@ -1,4 +1,4 @@
-export type LabelTag = "info" | "warning" | "error" | "success";
+export type LabelTag = "info" | "warning" | "warn" | "error" | "success";
 
 export interface LabelProps {
   text: string;

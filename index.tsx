@@ -1,4 +1,5 @@
 import { render } from "ink";
+import React from "react";
 import App from "./src/app/app";
 import { existsSync, statSync } from "node:fs";
 import { APP_DIRECTORY_NAME } from "./src/config";
@@ -21,7 +22,7 @@ async function main() {
     await _Util._update(appPath);
   }
 
-  render(App());
+  render(<App />);
 }
 
 // RUN !!!

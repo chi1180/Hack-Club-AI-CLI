@@ -13,6 +13,7 @@ export function log({ text, tag }: LabelProps) {
       label = chalk.bgGreenBright.black(formattedTag);
       break;
     case "warning":
+    case "warn":
       label = chalk.bgYellowBright.black(formattedTag);
       break;
     case "info":
