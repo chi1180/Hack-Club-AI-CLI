@@ -10,10 +10,20 @@ import type {
 } from "../../../types/components/chat.types";
 import type { Message } from "../../../types/ai/chatCompletions.types";
 import type { ImageGenerationResult } from "../../../types/ai/generateImage.types";
+import type {
+  CommandContext,
+  CommandAction,
+} from "../../../types/commands/command.types";
 import {
   parseFileAttachment,
   getFileInfo,
 } from "../../../lib/ai/methods/vision";
+import {
+  commandRegistry,
+  isCommand,
+  parseCommand,
+  registerBuiltinCommands,
+} from "../../../lib/commands";
 import MessageList from "./MessageList";
 import InputBox from "./InputBox";
 import StatusBar from "./StatusBar";
@@ -53,7 +63,7 @@ export default function ChatContainer({
   // State
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [viewState, setViewState] = useState<ChatViewState>("idle");
-  const [currentModel] = useState(initialModel);
+  const [currentModel, setCurrentModel] = useState(initialModel);
   const [totalTokens, setTotalTokens] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(true);
@@ -71,6 +81,16 @@ export default function ChatContainer({
 
   // Ref to track if init has run
   const initRan = useRef(false);
+  // Ref to track if commands have been registered
+  const commandsRegistered = useRef(false);
+
+  // Register commands on first render
+  useEffect(() => {
+    if (!commandsRegistered.current) {
+      registerBuiltinCommands();
+      commandsRegistered.current = true;
+    }
+  }, []);
 
   /**
    * Create a new chat session
@@ -203,106 +223,123 @@ export default function ChatContainer({
   }, []);
 
   /**
-   * Handle slash commands
+   * Process command actions returned from command execution
    */
-  const handleCommand = useCallback(
-    async (command: string) => {
-      const parts = command.trim().split(" ");
-      const cmdName = parts[0]?.toLowerCase() ?? "";
-      const args = parts.slice(1);
+  const processCommandActions = useCallback(
+    async (actions: CommandAction[]) => {
+      for (const action of actions) {
+        switch (action.type) {
+          case "none":
+            break;
 
-      switch (cmdName) {
-        case "/quit":
-        case "/exit":
-        case "/q":
-          exit();
-          break;
+          case "exit":
+            exit();
+            break;
 
-        case "/clear":
-          setMessages([]);
-          setTotalTokens(0);
-          setError(null);
-          break;
+          case "clearMessages":
+            setMessages([]);
+            break;
 
-        case "/new":
-          await createNewChat();
-          break;
+          case "clearTokens":
+            setTotalTokens(0);
+            break;
 
-        case "/help":
-          setShowHelp((prev) => !prev);
-          break;
+          case "clearError":
+            setError(null);
+            break;
 
-        case "/image":
-        case "/img":
-        case "/generate": {
-          // If there's a prompt after the command, use it
-          const prompt = args.length > 0 ? args.join(" ") : undefined;
-          setImagePrompt(prompt);
-          setViewMode("imageGenerator");
-          break;
-        }
+          case "setError":
+            setError(action.message);
+            break;
 
-        case "/chats":
-          if (args.length > 0 && args[0]?.toLowerCase() === "new") {
-            await createNewChat();
-          } else {
-            // TODO: Implement chats list view
-            const count = await db._Chats.count();
-            setError(`You have ${count} saved chats. Chats view coming soon!`);
-          }
-          break;
+          case "showInfo":
+            // Use setError for now to display info (could be improved with a separate info state)
+            setError(action.message);
+            break;
 
-        case "/star":
-          if (currentChatId) {
-            await db._Chats.toggleStar(currentChatId);
-            setError("Chat starred!");
-          }
-          break;
+          case "setMessages":
+            setMessages(action.messages);
+            break;
 
-        case "/title":
-          if (args.length > 0 && currentChatId) {
-            const newTitle = args.join(" ");
-            await db._Chats.rename(currentChatId, newTitle);
-            setCurrentChatTitle(newTitle);
-          } else {
-            setError("Usage: /title <new title>");
-          }
-          break;
+          case "addMessage":
+            setMessages((prev) => [...prev, action.message]);
+            break;
 
-        case "/export":
-          if (currentChatId) {
-            const markdown = await db._Chats.exportAsMarkdown(currentChatId);
-            if (markdown) {
-              // For now, just show success message
-              setError("Export functionality coming soon!");
+          case "toggleHelp":
+            setShowHelp((prev) => !prev);
+            break;
+
+          case "setViewMode":
+            setViewMode(action.mode);
+            if (action.prompt !== undefined) {
+              setImagePrompt(action.prompt);
             }
-          }
-          break;
+            break;
 
-        case "/models":
-          // TODO: Implement models view
-          setError("Models view not implemented yet. Using: " + currentModel);
-          break;
+          case "createNewChat":
+            await createNewChat();
+            break;
 
-        case "/stats":
-          // TODO: Implement stats view
-          try {
-            const stats = await ai._getStats();
-            setError(
-              `Total requests: ${stats.totalRequests}, Total tokens: ${stats.totalTokens}`,
-            );
-          } catch {
-            setError("Failed to fetch stats");
-          }
-          break;
+          case "setChatId":
+            setCurrentChatId(action.chatId);
+            break;
 
-        default:
-          setError(
-            `Unknown command: ${command}. Type /help for available commands.`,
-          );
+          case "setChatTitle":
+            setCurrentChatTitle(action.title);
+            break;
+
+          case "setModel":
+            setCurrentModel(action.model);
+            break;
+        }
       }
     },
-    [exit, currentChatId, currentModel, db, ai, createNewChat],
+    [exit, createNewChat],
+  );
+
+  /**
+   * Handle slash commands using the modular command system
+   */
+  const handleCommand = useCallback(
+    async (input: string) => {
+      const parsed = parseCommand(input);
+
+      if (!parsed) {
+        setError("Invalid command format");
+        return;
+      }
+
+      // Build the command context
+      const context: CommandContext = {
+        ai,
+        db,
+        currentChatId,
+        currentChatTitle,
+        currentModel,
+        messages,
+        totalTokens,
+      };
+
+      // Execute the command
+      const result = await commandRegistry.execute(
+        parsed.name,
+        parsed.args,
+        context,
+      );
+
+      // Process the resulting actions
+      await processCommandActions(result.actions);
+    },
+    [
+      ai,
+      db,
+      currentChatId,
+      currentChatTitle,
+      currentModel,
+      messages,
+      totalTokens,
+      processCommandActions,
+    ],
   );
 
   /**
@@ -311,7 +348,7 @@ export default function ChatContainer({
   const handleSubmit = useCallback(
     async (text: string) => {
       // Check for commands
-      if (text.startsWith("/")) {
+      if (isCommand(text)) {
         await handleCommand(text);
         return;
       }

@@ -1,29 +1,60 @@
+import { useMemo } from "react";
 import { Box, Text } from "ink";
 import { PALETTE } from "../../../config";
 import type { CommandsHelpProps } from "../../../types/components/chat.types";
+import { commandRegistry } from "../../../lib/commands";
+import type { CommandCategory } from "../../../types/commands/command.types";
+
+/**
+ * Category display order and labels
+ */
+const CATEGORY_CONFIG: Record<
+  CommandCategory,
+  { label: string; order: number }
+> = {
+  chat: { label: "Chat", order: 1 },
+  ai: { label: "AI", order: 2 },
+  navigation: { label: "Navigation", order: 3 },
+  utility: { label: "Utility", order: 4 },
+  system: { label: "System", order: 5 },
+};
+
+const specialPrefixes = [
+  { key: "@file:path", desc: "Attach image for analysis" },
+];
 
 /**
  * CommandsHelp - Displays available commands help
+ * Dynamically pulls command list from the command registry
  */
 export default function CommandsHelp({ visible = true }: CommandsHelpProps) {
+  // Get commands from registry, grouped by category
+  // Hooks must be called before any early returns
+  const commandsByCategory = useMemo(() => {
+    const commands = commandRegistry.getCommandList();
+    const grouped = new Map<CommandCategory, typeof commands>();
+
+    for (const cmd of commands) {
+      const existing = grouped.get(cmd.category) ?? [];
+      existing.push(cmd);
+      grouped.set(cmd.category, existing);
+    }
+
+    // Sort categories by order
+    const sortedCategories = Array.from(grouped.entries()).sort(
+      ([a], [b]) => CATEGORY_CONFIG[a].order - CATEGORY_CONFIG[b].order,
+    );
+
+    return sortedCategories;
+  }, []);
+
+  // Flatten commands for simple display
+  const allCommands = useMemo(() => {
+    return commandsByCategory.flatMap(([_, cmds]) => cmds);
+  }, [commandsByCategory]);
+
+  // Early return after all hooks have been called
   if (!visible) return null;
-
-  const commands = [
-    { key: "/new", desc: "New chat" },
-    { key: "/chats", desc: "List conversations" },
-    { key: "/image", desc: "Generate image" },
-    { key: "/models", desc: "Switch AI model" },
-    { key: "/stats", desc: "View usage stats" },
-    { key: "/title", desc: "Rename chat" },
-    { key: "/star", desc: "Star/unstar chat" },
-    { key: "/clear", desc: "Clear messages" },
-    { key: "/help", desc: "Toggle this help" },
-    { key: "/quit", desc: "Exit CLI" },
-  ];
-
-  const specialPrefixes = [
-    { key: "@file:path", desc: "Attach image for analysis" },
-  ];
 
   return (
     <Box
@@ -39,12 +70,12 @@ export default function CommandsHelp({ visible = true }: CommandsHelpProps) {
       </Box>
 
       <Box flexWrap="wrap" marginBottom={1}>
-        {commands.map((cmd) => (
-          <Box key={cmd.key} marginRight={2}>
+        {allCommands.map((cmd) => (
+          <Box key={cmd.name} marginRight={2}>
             <Text color={PALETTE.info} bold>
-              {cmd.key}
+              /{cmd.name}
             </Text>
-            <Text color={PALETTE.dim}> {cmd.desc}</Text>
+            <Text color={PALETTE.dim}> {cmd.description}</Text>
           </Box>
         ))}
       </Box>
