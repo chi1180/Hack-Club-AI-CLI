@@ -1,10 +1,11 @@
-import { useState, useCallback } from "react";
-import { Box, Text, useInput } from "ink";
+import { useState } from "react";
+import { Box, Text } from "ink";
+import TextInput from "ink-text-input";
 import { PALETTE } from "../../../config";
 import type { InputBoxProps } from "../../../types/components/chat.types";
 
 /**
- * InputBox - Text input component for chat messages
+ * InputBox - Text input component for chat messages using ink-text-input
  */
 export default function InputBox({
   onSubmit,
@@ -12,97 +13,12 @@ export default function InputBox({
   placeholder = "Type a message...",
 }: InputBoxProps) {
   const [value, setValue] = useState("");
-  const [cursorPosition, setCursorPosition] = useState(0);
 
-  useInput(
-    (input, key) => {
-      if (disabled) return;
-
-      // Submit on Enter
-      if (key.return) {
-        if (value.trim()) {
-          onSubmit(value.trim());
-          setValue("");
-          setCursorPosition(0);
-        }
-        return;
-      }
-
-      // Delete character
-      if (key.backspace || key.delete) {
-        if (cursorPosition > 0) {
-          setValue((prev) =>
-            prev.slice(0, cursorPosition - 1) + prev.slice(cursorPosition)
-          );
-          setCursorPosition((prev) => prev - 1);
-        }
-        return;
-      }
-
-      // Move cursor left
-      if (key.leftArrow) {
-        setCursorPosition((prev) => Math.max(0, prev - 1));
-        return;
-      }
-
-      // Move cursor right
-      if (key.rightArrow) {
-        setCursorPosition((prev) => Math.min(value.length, prev + 1));
-        return;
-      }
-
-      // Home key - move to start
-      if (key.ctrl && input === "a") {
-        setCursorPosition(0);
-        return;
-      }
-
-      // End key - move to end
-      if (key.ctrl && input === "e") {
-        setCursorPosition(value.length);
-        return;
-      }
-
-      // Clear line
-      if (key.ctrl && input === "u") {
-        setValue("");
-        setCursorPosition(0);
-        return;
-      }
-
-      // Add regular character
-      if (input && !key.ctrl && !key.meta) {
-        setValue((prev) =>
-          prev.slice(0, cursorPosition) + input + prev.slice(cursorPosition)
-        );
-        setCursorPosition((prev) => prev + input.length);
-      }
-    },
-    { isActive: !disabled }
-  );
-
-  // Render the input with cursor
-  const renderInput = () => {
-    if (value === "") {
-      return (
-        <>
-          <Text backgroundColor="#495057"> </Text>
-          <Text color={PALETTE.dim}>{placeholder}</Text>
-        </>
-      );
+  const handleSubmit = (val: string) => {
+    if (val.trim() && !disabled) {
+      onSubmit(val.trim());
+      setValue("");
     }
-
-    const beforeCursor = value.slice(0, cursorPosition);
-    const atCursor = value[cursorPosition] || " ";
-    const afterCursor = value.slice(cursorPosition + 1);
-
-    return (
-      <>
-        <Text>{beforeCursor}</Text>
-        <Text backgroundColor="#495057">{atCursor}</Text>
-        <Text>{afterCursor}</Text>
-      </>
-    );
   };
 
   return (
@@ -110,11 +26,22 @@ export default function InputBox({
       borderStyle="round"
       borderColor={disabled ? PALETTE.dim : PALETTE.info}
       paddingX={1}
+      width="100%"
+      height={3}
     >
       <Text color={disabled ? PALETTE.dim : PALETTE.info} bold>
         {"› "}
       </Text>
-      {renderInput()}
+      {disabled ? (
+        <Text color={PALETTE.dim}>{placeholder}</Text>
+      ) : (
+        <TextInput
+          value={value}
+          onChange={setValue}
+          placeholder={placeholder}
+          onSubmit={handleSubmit}
+        />
+      )}
     </Box>
   );
 }

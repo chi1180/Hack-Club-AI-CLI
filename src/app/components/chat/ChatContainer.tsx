@@ -27,7 +27,8 @@ import {
 import MessageList from "./MessageList";
 import InputBox from "./InputBox";
 import StatusBar from "./StatusBar";
-import CommandsHelp from "./CommandsHelp";
+import ChatHistoryPanel from "./ChatHistoryPanel";
+import ChatHeader from "./ChatHeader";
 import { ImageGenerator } from "../image";
 import path from "node:path";
 
@@ -103,12 +104,47 @@ export default function ChatContainer({
       setMessages([]);
       setTotalTokens(0);
       setError(null);
+      setShowHelp(false);
       return chat;
     } catch (_err) {
       setError("Failed to create new chat");
       return null;
     }
   }, [db]);
+
+  /**
+   * Load a chat by ID
+   */
+  const loadChat = useCallback(
+    async (chatId: string) => {
+      try {
+        const chat = await db._Chats.get(chatId);
+        if (!chat) {
+          setError("Chat not found");
+          return;
+        }
+
+        setCurrentChatId(chat.id);
+        setCurrentChatTitle(chat.title);
+
+        // Convert chat messages to display messages
+        const displayMessages: DisplayMessage[] = chat.messages.map((msg) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp,
+        }));
+
+        setMessages(displayMessages);
+        setTotalTokens(0); // Reset tokens for loaded chat
+        setError(null);
+        setShowHelp(false);
+      } catch (_err) {
+        setError("Failed to load chat");
+      }
+    },
+    [db],
+  );
 
   /**
    * Save current message to chat history
@@ -524,38 +560,46 @@ export default function ChatContainer({
   }
 
   return (
-    <Box flexDirection="column" width="100%">
-      {/* Status Bar */}
-      <StatusBar
-        model={currentModel}
-        tokenCount={totalTokens}
-        isStreaming={viewState === "streaming"}
+    <Box
+      flexDirection="row"
+      width={process.stdout.columns}
+      height={process.stdout.rows}
+      gap={1}
+      padding={1}
+    >
+      {/* Left Panel - Chat History */}
+      <ChatHistoryPanel
+        db={db}
+        currentChatId={currentChatId}
+        onChatSelect={loadChat}
+        onNewChat={createNewChat}
       />
 
-      {/* Chat Title */}
-      <Box paddingX={1} marginBottom={1}>
-        <Text color={PALETTE.dim}>Chat: </Text>
-        <Text bold>{currentChatTitle}</Text>
-        {currentChatId && (
-          <Text color={PALETTE.dim}> ({messages.length} messages)</Text>
-        )}
-      </Box>
+      {/* Main Chat Area */}
+      <Box flexDirection="column" flexGrow={1} height="100%">
+        {/* Chat Header */}
+        <ChatHeader
+          chatTitle={currentChatTitle}
+          messageCount={messages.length}
+          model={currentModel}
+          tokenCount={totalTokens}
+          isStreaming={viewState === "streaming"}
+        />
 
-      {/* Messages */}
-      <Box flexDirection="column" flexGrow={1} paddingX={1}>
-        <MessageList messages={messages} />
-      </Box>
-
-      {/* Error display */}
-      {error && (
-        <Box paddingX={1} marginBottom={1}>
-          <Text color={PALETTE.error}>⚠ {error}</Text>
+        {/* Messages */}
+        <Box flexDirection="column" flexGrow={1} height="100%" paddingX={1}>
+          <MessageList messages={messages} />
         </Box>
-      )}
 
-      {/* Input Box */}
-      <Box paddingX={1}>
-        <Box flexGrow={1}>
+        {/* Error display */}
+        {error && (
+          <Box paddingX={1} marginBottom={1}>
+            <Text color={PALETTE.error}>⚠ {error}</Text>
+          </Box>
+        )}
+
+        {/* Input Box */}
+        <Box paddingX={1}>
           <InputBox
             onSubmit={handleSubmit}
             disabled={isDisabled}
@@ -567,9 +611,6 @@ export default function ChatContainer({
           />
         </Box>
       </Box>
-
-      {/* Commands Help */}
-      <CommandsHelp visible={showHelp && messages.length === 0} />
     </Box>
   );
 }

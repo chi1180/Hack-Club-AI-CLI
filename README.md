@@ -5,11 +5,16 @@ A terminal-based chat interface for Hack Club AI API. Built with [Bun](https://b
 ## Features
 
 - 💬 **Interactive Chat**: Real-time streaming chat with AI models
-- 🎨 **Beautiful UI**: Colorful terminal interface with rainbow gradient hero
+- 🎨 **Beautiful UI**: Modern 3-panel TUI inspired by Open-web-ui
+  - 📜 Left panel: Chat history with quick navigation
+  - 💭 Center panel: Main chat area with message list
+  - 💡 Bottom panel: Quick tips and notifications
 - 📝 **Multiple Models**: Support for various AI models via Hack Club AI API
 - 🖼️ **Image Generation**: Generate images using Gemini models
-- 💾 **Chat History**: Save and restore conversations
+- 👁️ **Vision Support**: Analyze images with @file attachment
+- 💾 **Chat History**: Save and restore conversations with automatic persistence
 - ⚡ **Fast**: Built with Bun for maximum performance
+- ⌨️ **Keyboard Navigation**: Full keyboard control for productivity
 
 ## Prerequisites
 
@@ -65,20 +70,24 @@ bun run index.tsx
 
 ### Special Prefixes
 
-| Prefix   | Description                         |
-| -------- | ----------------------------------- |
-| `@file`  | Attach file content to your message |
-| `#image` | Generate an image                   |
+| Prefix         | Description                            |
+| -------------- | -------------------------------------- |
+| `@file:path`   | Attach image file for vision analysis  |
+| `/image`       | Generate an image (followed by prompt) |
 
 ### Keyboard Shortcuts
 
-| Key       | Action               |
-| --------- | -------------------- |
-| `Enter`   | Send message         |
-| `Ctrl+U`  | Clear input line     |
-| `Ctrl+A`  | Move cursor to start |
-| `Ctrl+E`  | Move cursor to end   |
-| `←` / `→` | Move cursor          |
+| Key          | Action                           |
+| ------------ | -------------------------------- |
+| `Enter`      | Send message                     |
+| `Ctrl+L`     | Toggle chat history sidebar      |
+| `↑` / `↓`    | Navigate chats (in sidebar mode) |
+| `N`          | New chat (in sidebar mode)       |
+| `Esc`        | Exit sidebar mode                |
+| `Ctrl+U`     | Clear input line                 |
+| `Ctrl+A`     | Move cursor to start             |
+| `Ctrl+E`     | Move cursor to end               |
+| `←` / `→`    | Move cursor                      |
 
 ## Project Structure
 

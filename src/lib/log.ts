@@ -17,7 +17,7 @@ export function log({ text, tag }: LabelProps) {
       label = chalk.bgYellowBright.black(formattedTag);
       break;
     case "info":
-      label = chalk.bgBlueBright.white(formattedTag);
+      label = chalk.bgBlueBright.black(formattedTag);
       break;
     default:
       console.error(`Unexpected tag: ${tag}`);

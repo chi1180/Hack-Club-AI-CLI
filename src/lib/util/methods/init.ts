@@ -1,6 +1,6 @@
-import fs from "node:fs";
 import { log } from "../../log";
 import { DB } from "../../db/db";
+import { mkdir } from "node:fs/promises";
 
 export async function init(appDirPath: string) {
   log({
@@ -9,7 +9,7 @@ export async function init(appDirPath: string) {
   });
 
   // make directory
-  fs.mkdirSync(appDirPath);
+  await mkdir(appDirPath);
 
   // run settings initialization
   const _DB = new DB(appDirPath);
